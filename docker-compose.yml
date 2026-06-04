@@ -1,0 +1,26 @@
+# Optional containerised run (for later deploy). Local dev: prefer ./run.sh
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Bind to all interfaces inside the container.
+      BACKEND_HOST: 0.0.0.0
+      DATABASE_URL: sqlite:////data/market.db
+    volumes:
+      - market-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  market-data:
