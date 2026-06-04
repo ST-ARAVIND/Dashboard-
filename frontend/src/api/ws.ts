@@ -1,14 +1,16 @@
 // Live-tick websocket client with auto-reconnect and per-token subscriptions.
-import type { Tick } from "./types";
+import type { AlertEvent, Tick } from "./types";
 
 type TickHandler = (tick: Tick) => void;
 type StateHandler = (state: { connected: boolean; marketStatus?: string }) => void;
+type AlertHandler = (alert: AlertEvent) => void;
 
 export class LiveFeed {
   private ws: WebSocket | null = null;
   private url: string;
   private tickHandlers = new Set<TickHandler>();
   private stateHandlers = new Set<StateHandler>();
+  private alertHandlers = new Set<AlertHandler>();
   private subscribed = new Map<string, { token: string; exch_seg: string }>();
   private reconnectDelay = 1000;
   private pingTimer?: number;
@@ -48,6 +50,7 @@ export class LiveFeed {
     this.ws.onmessage = (ev) => {
       const msg = JSON.parse(ev.data);
       if (msg.type === "tick") this.tickHandlers.forEach((h) => h(msg));
+      else if (msg.type === "alert") this.alertHandlers.forEach((h) => h(msg));
       else if (msg.type === "market_state") this.emitState({ connected: true, marketStatus: msg.status });
     };
 
@@ -86,6 +89,11 @@ export class LiveFeed {
   onState(h: StateHandler) {
     this.stateHandlers.add(h);
     return () => this.stateHandlers.delete(h);
+  }
+
+  onAlert(h: AlertHandler) {
+    this.alertHandlers.add(h);
+    return () => this.alertHandlers.delete(h);
   }
 
   private emitState(s: { connected: boolean; marketStatus?: string }) {

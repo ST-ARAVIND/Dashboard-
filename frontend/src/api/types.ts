@@ -137,6 +137,46 @@ export interface Tick {
   ts: string | null;
 }
 
+export interface AlertRule {
+  id: number;
+  token: string;
+  symbol: string;
+  exch_seg: string;
+  metric: "ltp" | "percent_change" | "oi";
+  operator: "above" | "below";
+  threshold: number;
+  note: string;
+  active: boolean;
+  repeat: boolean;
+  triggered_at: string | null;
+  triggered_value: number | null;
+  created_at: string | null;
+}
+
+export interface NewAlert {
+  token: string;
+  symbol: string;
+  exch_seg: string;
+  metric: string;
+  operator: string;
+  threshold: number;
+  note?: string;
+  repeat?: boolean;
+}
+
+export interface AlertEvent {
+  type: "alert";
+  id: number;
+  symbol: string;
+  token: string;
+  metric: string;
+  operator: string;
+  threshold: number;
+  value: number;
+  note: string;
+  ts: string | null;
+}
+
 export interface Candle {
   time: string;
   open: number;

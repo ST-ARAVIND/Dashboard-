@@ -48,6 +48,39 @@ class WSHub:
         # Hop from the feed thread onto the event loop safely.
         self._loop.call_soon_threadsafe(asyncio.create_task, self._broadcast(tick))
 
+        # Evaluate price/OI alerts against this tick; broadcast any that fire.
+        try:
+            from .alerts import alert_manager
+
+            fired = alert_manager.evaluate(tick)
+            for f in fired:
+                msg = {
+                    "type": "alert",
+                    "id": f["id"],
+                    "symbol": f["symbol"],
+                    "token": f["token"],
+                    "metric": f["metric"],
+                    "operator": f["operator"],
+                    "threshold": f["threshold"],
+                    "value": f["value"],
+                    "note": f.get("note", ""),
+                    "ts": tick.get("ts"),
+                }
+                self._loop.call_soon_threadsafe(asyncio.create_task, self._broadcast_all(msg))
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("alert eval error: %s", exc)
+
+    async def _broadcast_all(self, msg: dict) -> None:
+        """Send a message (e.g. a fired alert) to every connected client."""
+        dead = []
+        for ws in list(self._clients):
+            try:
+                await ws.send_json(msg)
+            except Exception:  # noqa: BLE001
+                dead.append(ws)
+        for ws in dead:
+            await self.disconnect(ws)
+
     async def _broadcast(self, tick: dict) -> None:
         token = tick.get("token")
         targets = list(self._interest.get(token, ())) if token else list(self._clients)

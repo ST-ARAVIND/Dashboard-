@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { SearchBar } from "./SearchBar";
 import { Clock } from "./Clock";
+import { AlertToaster } from "./AlertToaster";
 
 const NAV = [
   { to: "/", label: "Overview", end: true },
@@ -11,6 +12,7 @@ const NAV = [
   { to: "/analytics", label: "Analytics" },
   { to: "/news", label: "News & Sentiment" },
   { to: "/watchlist", label: "Watchlist" },
+  { to: "/alerts", label: "Alerts" },
 ];
 
 function MarketBadge({ marketStatus }: { marketStatus?: string }) {
@@ -70,6 +72,7 @@ export default function Layout() {
       <main className="flex-1 p-4">
         <Outlet />
       </main>
+      <AlertToaster />
     </div>
   );
 }

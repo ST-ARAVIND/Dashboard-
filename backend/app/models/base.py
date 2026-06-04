@@ -35,7 +35,7 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False
 def init_db() -> None:
     """Create all tables. Safe to call repeatedly."""
     # Import side-effect: ensure every model is registered on Base.metadata.
-    from . import instrument, candle, news, watchlist, oi_snapshot  # noqa: F401
+    from . import instrument, candle, news, watchlist, oi_snapshot, alert  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
 

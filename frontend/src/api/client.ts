@@ -1,9 +1,11 @@
 // Thin fetch wrapper around the backend REST API.
 import type {
+  AlertRule,
   Breadth,
   Candle,
   MarketSentiment,
   MarketState,
+  NewAlert,
   OptionChain,
   Quote,
   SearchResult,
@@ -81,6 +83,11 @@ export const api = {
   symbolSentiment: (symbol: string) => get<MarketSentiment>(`/sentiment/${symbol}`),
   refreshNews: () => post<{ ingested: number }>("/sentiment/refresh"),
   breadth: () => get<Breadth>("/breadth"),
+  alerts: () => get<{ alerts: AlertRule[] }>("/alerts"),
+  createAlert: (a: NewAlert) => post<AlertRule>("/alerts", a),
+  deleteAlert: (id: number) => del(`/alerts/${id}`),
+  toggleAlert: (id: number, active: boolean) =>
+    post<AlertRule>(`/alerts/${id}/toggle?active=${active}`),
   watchlist: () => get<{ items: WatchItem[] }>("/watchlist"),
   addWatch: (item: { token: string; symbol: string; exch_seg: string }) =>
     post("/watchlist", item),

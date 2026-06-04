@@ -5,6 +5,7 @@ from .candle import Candle
 from .news import NewsArticle
 from .watchlist import Watchlist, WatchlistItem
 from .oi_snapshot import OISnapshot
+from .alert import Alert
 
 __all__ = [
     "Base",
@@ -18,4 +19,5 @@ __all__ = [
     "Watchlist",
     "WatchlistItem",
     "OISnapshot",
+    "Alert",
 ]

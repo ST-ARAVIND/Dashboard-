@@ -65,6 +65,16 @@ async def lifespan(app: FastAPI):  # noqa: ANN201
                 angel_feed.start()
             else:
                 logger.info("Market closed — live feed will start at market open.")
+
+            # Load active alerts into memory and subscribe their tokens so they
+            # evaluate against live ticks even with no page open.
+            from .services.alerts import alert_manager
+
+            alert_manager.load_active()
+            alert_subs = alert_manager.subscribe_tokens()
+            if alert_subs:
+                angel_feed.subscribe(alert_subs)
+                logger.info("Subscribed %d alert tokens to feed", len(alert_subs))
         except Exception as exc:  # noqa: BLE001
             logger.error("Angel One login failed (continuing without live data): %s", exc)
     else:
