@@ -1,0 +1,17 @@
+# Netlify build config for the frontend (static SPA).
+# The backend is hosted separately (Render) — set VITE_API_BASE in the Netlify
+# UI (Site settings -> Environment variables) to your Render backend URL.
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"            # relative to base => frontend/dist
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# SPA fallback so React Router deep links (e.g. /symbol/2885) resolve.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -105,6 +105,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def api_token_guard(request: Request, call_next):  # noqa: ANN001, ANN201
+    """Optional shared-token gate on /api/* (skipped if API_AUTH_TOKEN unset)."""
+    if settings.api_auth_token:
+        path = request.url.path
+        # Allow health checks and CORS preflight through unauthenticated.
+        if (
+            path.startswith("/api/")
+            and path != "/api/health"
+            and request.method != "OPTIONS"
+        ):
+            if request.headers.get("X-API-Token") != settings.api_auth_token:
+                return JSONResponse(status_code=401, content={"detail": "Invalid or missing X-API-Token"})
+    return await call_next(request)
+
 @app.exception_handler(AngelAuthError)
 async def angel_auth_handler(request: Request, exc: AngelAuthError):  # noqa: ANN201
     """Surface missing/expired Angel auth as a clean 503 instead of a 500."""

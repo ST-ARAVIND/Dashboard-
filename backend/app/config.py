@@ -52,6 +52,13 @@ class Settings(BaseSettings):
     # --- Scheduler ---
     oi_snapshot_interval: int = Field(default=180, alias="OI_SNAPSHOT_INTERVAL")
 
+    # --- API protection (optional) ---
+    # If set, every /api/* request (except /api/health) must send this token in
+    # an `X-API-Token` header. Leave empty to keep the API open (local dev).
+    # NOTE: a token shipped to a public browser bundle is light protection, not
+    # real auth — it deters casual drive-by use of your Angel session/quota.
+    api_auth_token: str = Field(default="", alias="API_AUTH_TOKEN")
+
     # --- Scrip master ---
     scrip_master_url: str = Field(
         default="https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json",

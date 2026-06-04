@@ -10,8 +10,20 @@ import type {
   WatchItem,
 } from "./types";
 
+// In dev, VITE_API_BASE is empty and requests go through the Vite proxy ("/api").
+// In production (Netlify), set VITE_API_BASE to the backend URL, e.g.
+//   VITE_API_BASE=https://your-backend.onrender.com
+export const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+const API_TOKEN = import.meta.env.VITE_API_TOKEN ?? "";
+
+function headers(extra?: Record<string, string>): Record<string, string> {
+  const h: Record<string, string> = { ...extra };
+  if (API_TOKEN) h["X-API-Token"] = API_TOKEN;
+  return h;
+}
+
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`/api${path}`);
+  const res = await fetch(`${API_BASE}/api${path}`, { headers: headers() });
   if (!res.ok) {
     const detail = await res.json().catch(() => ({}));
     throw new Error(detail.detail || `${res.status} ${res.statusText}`);
@@ -20,9 +32,9 @@ async function get<T>(path: string): Promise<T> {
 }
 
 async function post<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: headers({ "Content-Type": "application/json" }),
     body: body ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -30,7 +42,7 @@ async function post<T>(path: string, body?: unknown): Promise<T> {
 }
 
 async function del<T>(path: string): Promise<T> {
-  const res = await fetch(`/api${path}`, { method: "DELETE" });
+  const res = await fetch(`${API_BASE}/api${path}`, { method: "DELETE", headers: headers() });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
 }

@@ -15,8 +15,15 @@ export class LiveFeed {
   private shouldRun = false;
 
   constructor() {
-    const proto = location.protocol === "https:" ? "wss" : "ws";
-    this.url = `${proto}://${location.host}/ws`;
+    // In dev (VITE_API_BASE empty) connect to the page host via the Vite ws
+    // proxy. In production, derive the ws URL from the backend's http(s) base.
+    const base = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+    if (base) {
+      this.url = base.replace(/^http/, "ws") + "/ws";
+    } else {
+      const proto = location.protocol === "https:" ? "wss" : "ws";
+      this.url = `${proto}://${location.host}/ws`;
+    }
   }
 
   connect() {

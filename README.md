@@ -151,6 +151,48 @@ Optional:
 
 ---
 
+## Deployment (Netlify frontend + Render backend)
+
+This is a two-part app: a static frontend (Netlify) and a long-running FastAPI
+backend with a live websocket (Render). They deploy separately; both auto-redeploy
+on every push to `main`.
+
+### 1. Backend → Render
+
+1. Render dashboard → **New + → Blueprint** → connect this repo. It reads `render.yaml`.
+2. On the service's **Environment** tab, set the secrets (these are `sync:false`, never
+   committed): `ANGEL_API_KEY`, `ANGEL_CLIENT_CODE`, `ANGEL_MPIN`, `ANGEL_TOTP_SECRET`,
+   and `CORS_ORIGINS` = your Netlify URL (e.g. `https://your-site.netlify.app`).
+   Optionally set `API_AUTH_TOKEN` to a random string.
+3. Deploy. Note the service URL, e.g. `https://market-dashboard-api.onrender.com`.
+   Check `https://…/api/health`.
+
+> **Free tier caveat:** Render free web services spin down after ~15 min idle and cold-start
+> (~30 s) on the next request. When you open the dashboard it wakes, logs in, and the live
+> feed connects; keeping the tab open (it polls) keeps it awake. For always-on during market
+> hours, use a paid instance. SQLite on free tier is **ephemeral** (resets on redeploy) — the
+> scrip master re-downloads on boot and OI/news rebuild; attach a Render Disk + point
+> `DATABASE_URL` at it for persistence, or switch `DATABASE_URL` to a managed Postgres.
+
+### 2. Frontend → Netlify
+
+1. Netlify → **Add new site → Import from Git** → pick this repo. It reads `netlify.toml`
+   (base `frontend`, publish `frontend/dist`).
+2. **Site settings → Environment variables:** set `VITE_API_BASE` = your Render URL
+   (no trailing slash). If you set `API_AUTH_TOKEN` on the backend, also set
+   `VITE_API_TOKEN` to the same value.
+3. Deploy. Every push to `main` rebuilds and redeploys automatically.
+
+### How prod differs from dev
+
+- **Dev:** `VITE_API_BASE` empty → the Vite proxy forwards `/api` and `/ws` to `localhost:8000`.
+- **Prod:** the frontend calls `VITE_API_BASE` directly for REST, and derives the websocket
+  URL from it (`https://…` → `wss://…/ws`). CORS on the backend must list the Netlify origin.
+- **API token** (optional): if `API_AUTH_TOKEN` is set, REST requires an `X-API-Token` header.
+  Browsers can't send custom headers on a websocket, so `/ws` is not token-gated — and a token
+  shipped in a public bundle is only light deterrence, not real auth. For a single-user
+  dashboard the practical protections are a private URL + the built-in rate limiting.
+
 ## Notes & limitations
 
 - Stock options are American; Black-Scholes is used as an acceptable approximation (a

@@ -1,0 +1,37 @@
+# Render blueprint for the FastAPI backend.
+# In the Render dashboard: New + -> Blueprint -> connect this repo. Then set the
+# secret env vars (marked sync:false) under the service's Environment tab.
+services:
+  - type: web
+    name: market-dashboard-api
+    runtime: python
+    plan: free                      # free spins down after ~15m idle (see README)
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      # --- Secrets: set these in the Render dashboard (not committed) ---
+      - key: ANGEL_API_KEY
+        sync: false
+      - key: ANGEL_CLIENT_CODE
+        sync: false
+      - key: ANGEL_MPIN
+        sync: false
+      - key: ANGEL_TOTP_SECRET
+        sync: false
+      # Comma-separated allowed origins = your Netlify site URL, e.g.
+      #   https://your-site.netlify.app
+      - key: CORS_ORIGINS
+        sync: false
+      # Optional shared token; if set, also set VITE_API_TOKEN on Netlify.
+      - key: API_AUTH_TOKEN
+        sync: false
+      - key: NEWS_PROVIDER
+        value: rss
+      - key: SENTIMENT_MODEL
+        value: vader
+      - key: RISK_FREE_RATE
+        value: "0.065"
