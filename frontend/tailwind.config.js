@@ -12,10 +12,10 @@ export default {
         },
         line: "#E3DBCB", // borders / dividers
         ink: {
-          DEFAULT: "#2A2620", // primary text — warm near-black
-          soft: "#5C564C", // secondary text
+          DEFAULT: "#211D17", // primary text — warm near-black (darkened)
+          soft: "#3F3A32", // secondary text (darkened for readability)
         },
-        muted: "#8C857A", // tertiary / labels
+        muted: "#615A4E", // tertiary / labels (darkened from #8C857A)
         bull: "#15803D", // gains (tuned for light bg)
         bear: "#C0392B", // losses
         accent: "#BE5A3A", // terracotta — links / active / highlights

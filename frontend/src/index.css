@@ -15,10 +15,12 @@ body,
 body {
   margin: 0;
   background-color: #f4efe6;
-  color: #2a2620;
+  color: #211d17;
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 13px;
-  -webkit-font-smoothing: antialiased;
+  font-weight: 450;
+  /* Let glyphs render at full weight (antialiased makes text look thinner). */
+  -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
 }
 
