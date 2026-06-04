@@ -103,7 +103,7 @@ export default function Analytics() {
         title="Intraday OI Trend (CE vs PE)"
         loading={oiLoading}
         error={oiErr ? (oiErr as Error).message : null}
-        empty={!oiLoading && history.length === 0 ? "OI trend builds from snapshots taken every few minutes during market hours." : null}
+        empty={!oiLoading && history.length === 0 ? "Intraday OI trend builds from periodic snapshots — it fills in through the trading session." : null}
       >
         <ResponsiveContainer width="100%" height={260}>
           <ComposedChart data={history}>

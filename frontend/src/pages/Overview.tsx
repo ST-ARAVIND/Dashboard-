@@ -52,19 +52,27 @@ export default function Overview() {
     refetchInterval: 60000,
   });
 
-  // Top OI movers from the NIFTY chain (largest |ΔOI| across CE/PE).
-  const movers = (() => {
-    if (!nifty?.rows) return [] as any[];
+  // Top OI movers from the NIFTY chain. Prefer largest |ΔOI| (intraday); when
+  // ΔOI isn't available yet (e.g. before snapshots accumulate / off-hours), fall
+  // back to the highest absolute OI strikes so the panel always shows last data.
+  const { movers, moversByDelta } = (() => {
+    if (!nifty?.rows) return { movers: [] as any[], moversByDelta: false };
     const legs: any[] = [];
     nifty.rows.forEach((r) => {
-      if (r.ce?.oi_change != null)
-        legs.push({ strike: r.strike, type: "CE", ...r.ce });
-      if (r.pe?.oi_change != null)
-        legs.push({ strike: r.strike, type: "PE", ...r.pe });
+      if (r.ce) legs.push({ strike: r.strike, type: "CE", ...r.ce });
+      if (r.pe) legs.push({ strike: r.strike, type: "PE", ...r.pe });
     });
-    return legs
-      .sort((a, b) => Math.abs(b.oi_change) - Math.abs(a.oi_change))
-      .slice(0, 8);
+    const withDelta = legs.filter((l) => l.oi_change != null);
+    if (withDelta.length) {
+      return {
+        movers: withDelta.sort((a, b) => Math.abs(b.oi_change) - Math.abs(a.oi_change)).slice(0, 8),
+        moversByDelta: true,
+      };
+    }
+    return {
+      movers: legs.filter((l) => l.oi != null).sort((a, b) => (b.oi ?? 0) - (a.oi ?? 0)).slice(0, 8),
+      moversByDelta: false,
+    };
   })();
 
   const vix = breadth?.india_vix;
@@ -126,17 +134,17 @@ export default function Overview() {
           </div>
         </Panel>
 
-        {/* Top OI movers */}
+        {/* Top OI movers (by ΔOI intraday, else by absolute OI) */}
         <Panel
-          title="NIFTY — Top OI Movers"
-          empty={movers.length ? null : "OI movers appear once intraday snapshots accumulate (market hours)."}
+          title={moversByDelta ? "NIFTY — Top OI Movers (ΔOI)" : "NIFTY — Top OI (open interest)"}
+          empty={movers.length ? null : "No chain data."}
         >
           <table className="w-full text-[12px]">
             <thead className="text-muted text-[10px] uppercase">
               <tr>
                 <th className="text-left font-medium pb-1">Strike</th>
                 <th className="text-left font-medium">Type</th>
-                <th className="text-right font-medium">ΔOI</th>
+                <th className="text-right font-medium">{moversByDelta ? "ΔOI" : "OI"}</th>
                 <th className="text-right font-medium">Buildup</th>
               </tr>
             </thead>
@@ -145,7 +153,9 @@ export default function Overview() {
                 <tr key={i} className="border-t border-line/50">
                   <td className="py-0.5">{m.strike}</td>
                   <td className={m.type === "CE" ? "text-bear" : "text-bull"}>{m.type}</td>
-                  <td className={`text-right ${signClass(m.oi_change)}`}>{compact(m.oi_change)}</td>
+                  <td className={`text-right ${moversByDelta ? signClass(m.oi_change) : ""}`}>
+                    {compact(moversByDelta ? m.oi_change : m.oi)}
+                  </td>
                   <td className="text-right">
                     <span className={`chip ${BUILDUP_LABEL[m.buildup]?.cls}`}>
                       {BUILDUP_LABEL[m.buildup]?.text}

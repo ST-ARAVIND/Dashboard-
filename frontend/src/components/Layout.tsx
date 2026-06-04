@@ -15,24 +15,40 @@ const NAV = [
   { to: "/alerts", label: "Alerts" },
 ];
 
-function MarketBadge({ marketStatus }: { marketStatus?: string }) {
+// A single calm status chip. Open => "Live" (or "Connecting" if the socket is
+// briefly down). Closed => a neutral "Showing last data" chip — never an
+// alarming "Market closed" / "Reconnecting", since all REST data still reflects
+// the last traded session.
+function StatusChip({ connected }: { connected: boolean }) {
   const { data } = useQuery({
     queryKey: ["market-state"],
     queryFn: api.marketState,
     refetchInterval: 30000,
   });
-  const status = marketStatus || data?.status || "…";
   const open = data?.is_open;
-  const color = open ? "bg-bull/20 text-bull" : "bg-bear/20 text-bear";
+  const title = `IST ${data?.server_time_ist ?? ""}`;
+
+  if (open) {
+    return connected ? (
+      <span className="chip bg-bull/20 text-bull" title={title}>
+        <span>●</span> Live
+      </span>
+    ) : (
+      <span className="chip bg-amber-500/20 text-amber-400" title={title}>
+        <span className="animate-pulse">●</span> Connecting
+      </span>
+    );
+  }
+  // Closed / weekend / holiday / pre-open — show last traded data, calmly.
   return (
-    <span className={`chip ${color}`} title={`IST ${data?.server_time_ist ?? ""}`}>
-      ● Market {status}
+    <span className="chip bg-slate-600/20 text-slate-300" title={title}>
+      <span>●</span> Showing last data
     </span>
   );
 }
 
 export default function Layout() {
-  const { connected, marketStatus } = useFeedConnection();
+  const { connected } = useFeedConnection();
   return (
     <div className="min-h-screen flex flex-col">
       <header className="h-12 border-b border-line flex items-center px-4 gap-4 bg-bg-panel sticky top-0 z-20">
@@ -60,13 +76,7 @@ export default function Layout() {
         </div>
         <div className="flex items-center gap-3">
           <Clock />
-          <MarketBadge marketStatus={marketStatus} />
-          <span
-            className={`chip ${connected ? "bg-bull/20 text-bull" : "bg-amber-500/20 text-amber-400"}`}
-          >
-            <span className={connected ? "" : "animate-pulse"}>{connected ? "●" : "○"}</span>
-            {connected ? "Live" : "Reconnecting"}
-          </span>
+          <StatusChip connected={connected} />
         </div>
       </header>
       <main className="flex-1 p-4">
