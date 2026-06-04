@@ -179,7 +179,7 @@ export default function Overview() {
       >
         <div className="space-y-1 max-h-64 overflow-auto">
           {(news?.articles ?? []).slice(0, 8).map((a) => (
-            <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="block text-slate-300 hover:text-slate-100 truncate">
+            <a key={a.id} href={a.url} target="_blank" rel="noreferrer" className="block text-ink-soft hover:text-ink truncate">
               <span className={signClass(a.sentiment_score)}>●</span> {a.title}
             </a>
           ))}

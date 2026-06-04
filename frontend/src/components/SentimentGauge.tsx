@@ -15,16 +15,16 @@ export function SentimentGauge({
   const rad = (angle * Math.PI) / 180;
   const nx = cx + r * Math.cos(rad);
   const ny = cy - r * Math.sin(rad);
-  const color = label === "bullish" ? "#16c784" : label === "bearish" ? "#ea3943" : "#eab308";
+  const color = label === "bullish" ? "#15803D" : label === "bearish" ? "#C0392B" : "#eab308";
 
   return (
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 180 110" className="w-44">
         <defs>
           <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0%" stopColor="#ea3943" />
+            <stop offset="0%" stopColor="#C0392B" />
             <stop offset="50%" stopColor="#eab308" />
-            <stop offset="100%" stopColor="#16c784" />
+            <stop offset="100%" stopColor="#15803D" />
           </linearGradient>
         </defs>
         <path
@@ -34,8 +34,8 @@ export function SentimentGauge({
           strokeWidth="12"
           strokeLinecap="round"
         />
-        <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="#e2e8f0" strokeWidth="3" />
-        <circle cx={cx} cy={cy} r="5" fill="#e2e8f0" />
+        <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="#2A2620" strokeWidth="3" />
+        <circle cx={cx} cy={cy} r="5" fill="#2A2620" />
       </svg>
       <div className="text-center -mt-2">
         <div className="text-2xl font-mono" style={{ color }}>

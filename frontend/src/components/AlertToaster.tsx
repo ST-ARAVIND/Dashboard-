@@ -41,8 +41,8 @@ export function AlertToaster() {
         >
           <div className="flex items-start justify-between gap-2">
             <div>
-              <div className="font-semibold text-slate-100">🔔 {t.symbol}</div>
-              <div className="text-[12px] text-slate-300 num">
+              <div className="font-semibold text-ink">🔔 {t.symbol}</div>
+              <div className="text-[12px] text-ink-soft num">
                 {METRIC_LABEL[t.metric] ?? t.metric} {t.operator === "above" ? "≥" : "≤"} {t.threshold} →{" "}
                 <span className={t.operator === "above" ? "text-bull" : "text-bear"}>{t.value}</span>
               </div>
@@ -50,7 +50,7 @@ export function AlertToaster() {
             </div>
             <button
               onClick={() => setToasts((prev) => prev.filter((x) => x._k !== t._k))}
-              className="text-muted hover:text-slate-200"
+              className="text-muted hover:text-ink"
             >
               ✕
             </button>

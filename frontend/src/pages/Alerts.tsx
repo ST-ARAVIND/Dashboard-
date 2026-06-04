@@ -132,7 +132,7 @@ export default function Alerts() {
             <input value={note} onChange={(e) => setNote(e.target.value)} className="input mt-1" />
           </div>
 
-          <label className="flex items-center gap-2 text-[12px] text-slate-300">
+          <label className="flex items-center gap-2 text-[12px] text-ink-soft">
             <input type="checkbox" checked={repeat} onChange={(e) => setRepeat(e.target.checked)} />
             Repeat (don't auto-disable after firing)
           </label>
@@ -166,13 +166,13 @@ export default function Alerts() {
                 {a.active ? "armed" : a.triggered_at ? "fired" : "off"}
               </Badge>
               <div className="flex-1">
-                <div className="num text-slate-200">
+                <div className="num text-ink">
                   {a.symbol}{" "}
                   <span className="text-muted">
                     {a.metric === "ltp" ? "LTP" : a.metric === "oi" ? "OI" : "% chg"}{" "}
                     {a.operator === "above" ? "≥" : "≤"} {a.threshold}
                   </span>
-                  {a.repeat && <span className="chip bg-slate-600/20 text-slate-400 ml-2">repeat</span>}
+                  {a.repeat && <span className="chip bg-ink/[0.07] text-muted ml-2">repeat</span>}
                 </div>
                 <div className="text-[11px] text-muted">
                   {a.note && <span>{a.note} · </span>}

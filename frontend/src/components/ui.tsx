@@ -101,9 +101,9 @@ export function Badge({
   const map: Record<string, string> = {
     bull: "bg-bull/20 text-bull",
     bear: "bg-bear/20 text-bear",
-    neutral: "bg-slate-600/20 text-slate-300",
+    neutral: "bg-ink/[0.07] text-ink-soft",
     accent: "bg-accent/20 text-accent",
-    warn: "bg-amber-500/20 text-amber-400",
+    warn: "bg-amber-500/20 text-amber-600",
   };
   return (
     <span className={`chip ${map[variant]}`} title={title}>

@@ -34,14 +34,14 @@ function StatusChip({ connected }: { connected: boolean }) {
         <span>●</span> Live
       </span>
     ) : (
-      <span className="chip bg-amber-500/20 text-amber-400" title={title}>
+      <span className="chip bg-amber-500/20 text-amber-600" title={title}>
         <span className="animate-pulse">●</span> Connecting
       </span>
     );
   }
   // Closed / weekend / holiday / pre-open — show last traded data, calmly.
   return (
-    <span className="chip bg-slate-600/20 text-slate-300" title={title}>
+    <span className="chip bg-ink/[0.07] text-ink-soft" title={title}>
       <span>●</span> Showing last data
     </span>
   );
@@ -52,10 +52,10 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="h-12 border-b border-line flex items-center px-4 gap-4 bg-bg-panel sticky top-0 z-20">
-        <div className="font-semibold tracking-tight text-slate-100">
+        <div className="font-semibold tracking-tight text-ink">
           🇮🇳 Market<span className="text-accent">Intel</span>
         </div>
-        <nav className="flex gap-1 text-slate-400">
+        <nav className="flex gap-1 text-muted">
           {NAV.map((n) => (
             <NavLink
               key={n.to}
@@ -63,7 +63,7 @@ export default function Layout() {
               end={n.end}
               className={({ isActive }) =>
                 `px-3 py-1.5 rounded text-[13px] ${
-                  isActive ? "text-slate-100 bg-bg-soft" : "hover:text-slate-200"
+                  isActive ? "text-ink bg-bg-soft" : "hover:text-ink"
                 }`
               }
             >

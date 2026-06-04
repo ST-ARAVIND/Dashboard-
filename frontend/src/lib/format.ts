@@ -20,7 +20,7 @@ export const compact = (v: number | null | undefined): string => {
 };
 
 export const signClass = (v: number | null | undefined): string =>
-  v === null || v === undefined || v === 0 ? "text-slate-300" : v > 0 ? "text-bull" : "text-bear";
+  v === null || v === undefined || v === 0 ? "text-ink-soft" : v > 0 ? "text-bull" : "text-bear";
 
 export const pct = (v: number | null | undefined): string =>
   v === null || v === undefined || Number.isNaN(v) ? "—" : `${v > 0 ? "+" : ""}${v.toFixed(2)}%`;
@@ -38,4 +38,4 @@ export const sentimentColor = (label: string): string =>
     ? "text-bull"
     : label === "bearish" || label === "negative"
     ? "text-bear"
-    : "text-slate-300";
+    : "text-ink-soft";

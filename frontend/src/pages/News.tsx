@@ -59,7 +59,7 @@ export default function News() {
         <button
           onClick={() => refresh.mutate()}
           disabled={refresh.isPending}
-          className="w-full panel py-2 hover:border-accent text-slate-200"
+          className="w-full panel py-2 hover:border-accent text-ink"
         >
           {refresh.isPending ? "Refreshing…" : "↻ Fetch latest news"}
         </button>

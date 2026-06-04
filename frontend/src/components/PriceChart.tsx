@@ -20,27 +20,27 @@ export function PriceChart({
     const chart = createChart(ref.current, {
       height,
       layout: {
-        background: { type: ColorType.Solid, color: "#111722" },
-        textColor: "#94a3b8",
+        background: { type: ColorType.Solid, color: "#FCFBF8" },
+        textColor: "#5C564C",
         fontFamily: "ui-monospace, monospace",
       },
       grid: {
-        vertLines: { color: "#1f2937" },
-        horzLines: { color: "#1f2937" },
+        vertLines: { color: "#E3DBCB" },
+        horzLines: { color: "#E3DBCB" },
       },
-      rightPriceScale: { borderColor: "#1f2937" },
-      timeScale: { borderColor: "#1f2937", timeVisible: true },
+      rightPriceScale: { borderColor: "#E3DBCB" },
+      timeScale: { borderColor: "#E3DBCB", timeVisible: true },
       crosshair: { mode: 0 },
     });
     chartRef.current = chart;
 
     const candleSeries = chart.addCandlestickSeries({
-      upColor: "#16c784",
-      downColor: "#ea3943",
-      borderUpColor: "#16c784",
-      borderDownColor: "#ea3943",
-      wickUpColor: "#16c784",
-      wickDownColor: "#ea3943",
+      upColor: "#15803D",
+      downColor: "#C0392B",
+      borderUpColor: "#15803D",
+      borderDownColor: "#C0392B",
+      wickUpColor: "#15803D",
+      wickDownColor: "#C0392B",
     });
 
     const toTime = (iso: string) => {
@@ -61,7 +61,7 @@ export function PriceChart({
     if (oiSeries && oiSeries.length) {
       const oi = chart.addHistogramSeries({
         priceScaleId: "oi",
-        color: "#3b82f6",
+        color: "#BE5A3A",
         priceFormat: { type: "volume" },
       });
       chart.priceScale("oi").applyOptions({

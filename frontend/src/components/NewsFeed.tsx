@@ -30,14 +30,14 @@ export function NewsFeed({ articles }: { articles: NewsArticle[] }) {
                   ? "bg-bull/20 text-bull"
                   : a.sentiment_label === "negative"
                   ? "bg-bear/20 text-bear"
-                  : "bg-slate-600/20 text-slate-400"
+                  : "bg-ink/[0.07] text-muted"
               }`}
             >
               {a.sentiment_score > 0 ? "+" : ""}
               {a.sentiment_score.toFixed(2)}
             </span>
             <div className="flex-1">
-              <div className="text-slate-200 leading-snug">{a.title}</div>
+              <div className="text-ink leading-snug">{a.title}</div>
               <div className="text-[11px] text-muted mt-0.5 flex gap-2 flex-wrap">
                 <span>{a.source}</span>
                 <span>· {timeAgo(a.published_at)}</span>

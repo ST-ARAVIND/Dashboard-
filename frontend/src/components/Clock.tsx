@@ -19,7 +19,7 @@ export function Clock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <span className="num text-[12px] text-slate-400" title="Indian Standard Time">
+    <span className="num text-[12px] text-muted" title="Indian Standard Time">
       {now} <span className="text-muted">IST</span>
     </span>
   );

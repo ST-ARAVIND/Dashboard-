@@ -1,20 +1,28 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Trading-desk palette.
-        bg: { DEFAULT: "#0a0e14", panel: "#111722", soft: "#161e2e" },
-        line: "#1f2937",
-        bull: "#16c784",
-        bear: "#ea3943",
-        accent: "#3b82f6",
-        muted: "#64748b",
+        // Warm "sandstone" light palette (Claude-like).
+        bg: {
+          DEFAULT: "#F4EFE6", // page background — warm sand
+          panel: "#FCFBF8", // cards — near-white warm
+          soft: "#EDE7DA", // hover / secondary surfaces
+        },
+        line: "#E3DBCB", // borders / dividers
+        ink: {
+          DEFAULT: "#2A2620", // primary text — warm near-black
+          soft: "#5C564C", // secondary text
+        },
+        muted: "#8C857A", // tertiary / labels
+        bull: "#15803D", // gains (tuned for light bg)
+        bear: "#C0392B", // losses
+        accent: "#BE5A3A", // terracotta — links / active / highlights
       },
       fontFamily: {
-        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
     },
   },

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
@@ -14,19 +14,24 @@ body,
 
 body {
   margin: 0;
-  background-color: #0a0e14;
-  color: #e2e8f0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #f4efe6;
+  color: #2a2620;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
-  border-radius: 4px;
+  background: #d8cdb9;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c9bca3;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -40,25 +45,25 @@ body {
     @apply font-mono tabular-nums;
   }
   .chip {
-    @apply inline-flex items-center gap-1 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded font-medium;
+    @apply inline-flex items-center gap-1 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded font-semibold;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-line bg-bg-soft px-3 py-1.5
-           text-slate-200 transition-colors hover:border-accent hover:text-white disabled:opacity-50
-           disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-line bg-bg-panel px-3 py-1.5
+           text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50
+           disabled:cursor-not-allowed shadow-sm;
   }
   .input {
-    @apply w-full bg-bg-soft border border-line rounded-md px-3 py-1.5 text-[13px] outline-none
-           transition-colors focus:border-accent placeholder:text-muted/70;
+    @apply w-full bg-bg-panel border border-line rounded-md px-3 py-1.5 text-[13px] text-ink outline-none
+           transition-colors focus:border-accent focus:ring-1 focus:ring-accent/30 placeholder:text-muted;
   }
   .card-hover {
-    @apply transition-all hover:border-accent/60 hover:bg-bg-soft/40;
+    @apply transition-all hover:border-accent/50 hover:shadow-md;
   }
 }
 
-/* Loading skeleton shimmer */
+/* Loading skeleton shimmer (light) */
 .skeleton {
-  background: linear-gradient(90deg, #161e2e 25%, #1f2937 37%, #161e2e 63%);
+  background: linear-gradient(90deg, #ece6d9 25%, #f6f2ea 37%, #ece6d9 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
   border-radius: 4px;
@@ -76,10 +81,10 @@ body {
   animation: flashDown 0.6s ease;
 }
 @keyframes flashUp {
-  0% { background-color: rgba(22, 199, 132, 0.35); }
+  0% { background-color: rgba(21, 128, 61, 0.22); }
   100% { background-color: transparent; }
 }
 @keyframes flashDown {
-  0% { background-color: rgba(234, 57, 67, 0.35); }
+  0% { background-color: rgba(192, 57, 43, 0.22); }
   100% { background-color: transparent; }
 }

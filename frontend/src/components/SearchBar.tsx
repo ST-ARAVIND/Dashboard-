@@ -58,7 +58,7 @@ export function SearchBar() {
               onClick={() => pick(r)}
               className="w-full text-left px-3 py-1.5 hover:bg-bg-soft flex justify-between items-center"
             >
-              <span className="font-mono text-slate-200">{r.symbol}</span>
+              <span className="font-mono text-ink">{r.symbol}</span>
               <span className="text-[11px] text-muted">
                 {r.exch_seg} · {r.instrumenttype || "EQ"}
               </span>

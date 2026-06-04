@@ -19,7 +19,13 @@ import { compact } from "../lib/format";
 
 const UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"];
 
-const tooltipStyle = { background: "#111722", border: "1px solid #1f2937", fontSize: 12 };
+const tooltipStyle = {
+  background: "#FCFBF8",
+  border: "1px solid #E3DBCB",
+  borderRadius: 8,
+  fontSize: 12,
+  color: "#2A2620",
+};
 
 // Background colour for an OI-change cell, scaled by magnitude vs the row-set max.
 function heatColor(value: number | null, max: number): string {
@@ -72,13 +78,13 @@ export default function Analytics() {
         <Panel title="IV Term Structure (ATM)" loading={termLoading} empty={termPoints.length ? null : "No data."}>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={termPoints}>
-              <CartesianGrid stroke="#1f2937" />
-              <XAxis dataKey="expiry" stroke="#64748b" fontSize={10} />
-              <YAxis stroke="#64748b" fontSize={10} unit="%" domain={["auto", "auto"]} />
+              <CartesianGrid stroke="#E3DBCB" />
+              <XAxis dataKey="expiry" stroke="#8C857A" fontSize={10} />
+              <YAxis stroke="#8C857A" fontSize={10} unit="%" domain={["auto", "auto"]} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="atm_iv" name="ATM IV" stroke="#3b82f6" strokeWidth={2} dot />
-              <Line type="monotone" dataKey="ce_iv" name="CE IV" stroke="#16c784" dot={false} strokeDasharray="4 2" />
-              <Line type="monotone" dataKey="pe_iv" name="PE IV" stroke="#ea3943" dot={false} strokeDasharray="4 2" />
+              <Line type="monotone" dataKey="atm_iv" name="ATM IV" stroke="#BE5A3A" strokeWidth={2} dot />
+              <Line type="monotone" dataKey="ce_iv" name="CE IV" stroke="#15803D" dot={false} strokeDasharray="4 2" />
+              <Line type="monotone" dataKey="pe_iv" name="PE IV" stroke="#C0392B" dot={false} strokeDasharray="4 2" />
             </LineChart>
           </ResponsiveContainer>
         </Panel>
@@ -87,11 +93,11 @@ export default function Analytics() {
         <Panel title="PCR (OI) by Expiry" loading={termLoading} empty={termPoints.length ? null : "No data."}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={termPoints}>
-              <CartesianGrid stroke="#1f2937" />
-              <XAxis dataKey="expiry" stroke="#64748b" fontSize={10} />
-              <YAxis stroke="#64748b" fontSize={10} domain={[0, "auto"]} />
+              <CartesianGrid stroke="#E3DBCB" />
+              <XAxis dataKey="expiry" stroke="#8C857A" fontSize={10} />
+              <YAxis stroke="#8C857A" fontSize={10} domain={[0, "auto"]} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="pcr_oi" name="PCR (OI)" fill="#3b82f6" radius={[3, 3, 0, 0]} />
+              <Bar dataKey="pcr_oi" name="PCR (OI)" fill="#BE5A3A" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
           <div className="text-[10px] text-muted mt-1">PCR &gt; 1 = put-heavy (bullish bias); &lt; 1 = call-heavy.</div>
@@ -107,13 +113,13 @@ export default function Analytics() {
       >
         <ResponsiveContainer width="100%" height={260}>
           <ComposedChart data={history}>
-            <CartesianGrid stroke="#1f2937" />
-            <XAxis dataKey="time" stroke="#64748b" fontSize={9} tickFormatter={(t) => (t || "").slice(11, 16)} />
-            <YAxis yAxisId="oi" stroke="#64748b" fontSize={10} tickFormatter={(v) => compact(v)} />
+            <CartesianGrid stroke="#E3DBCB" />
+            <XAxis dataKey="time" stroke="#8C857A" fontSize={9} tickFormatter={(t) => (t || "").slice(11, 16)} />
+            <YAxis yAxisId="oi" stroke="#8C857A" fontSize={10} tickFormatter={(v) => compact(v)} />
             <YAxis yAxisId="pcr" orientation="right" stroke="#eab308" fontSize={10} domain={[0, "auto"]} />
             <Tooltip contentStyle={tooltipStyle} />
-            <Area yAxisId="oi" type="monotone" dataKey="ce_oi" name="CE OI" stroke="#16c784" fill="#16c78422" />
-            <Area yAxisId="oi" type="monotone" dataKey="pe_oi" name="PE OI" stroke="#ea3943" fill="#ea394322" />
+            <Area yAxisId="oi" type="monotone" dataKey="ce_oi" name="CE OI" stroke="#15803D" fill="#15803D22" />
+            <Area yAxisId="oi" type="monotone" dataKey="pe_oi" name="PE OI" stroke="#C0392B" fill="#C0392B22" />
             <Line yAxisId="pcr" type="monotone" dataKey="pcr_oi" name="PCR" stroke="#eab308" dot={false} strokeWidth={2} />
           </ComposedChart>
         </ResponsiveContainer>

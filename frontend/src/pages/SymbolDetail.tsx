@@ -124,24 +124,24 @@ export default function SymbolDetail() {
           <Panel title={`IV Smile — ${underlying} ${chain.expiry}`}>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={ivSmile}>
-                <CartesianGrid stroke="#1f2937" />
-                <XAxis dataKey="strike" stroke="#64748b" fontSize={10} />
-                <YAxis stroke="#64748b" fontSize={10} unit="%" />
-                <Tooltip contentStyle={{ background: "#111722", border: "1px solid #1f2937" }} />
-                <Line type="monotone" dataKey="CE" stroke="#16c784" dot={false} />
-                <Line type="monotone" dataKey="PE" stroke="#ea3943" dot={false} />
+                <CartesianGrid stroke="#E3DBCB" />
+                <XAxis dataKey="strike" stroke="#8C857A" fontSize={10} />
+                <YAxis stroke="#8C857A" fontSize={10} unit="%" />
+                <Tooltip contentStyle={{ background: "#FCFBF8", border: "1px solid #E3DBCB", borderRadius: 8, color: "#2A2620" }} />
+                <Line type="monotone" dataKey="CE" stroke="#15803D" dot={false} />
+                <Line type="monotone" dataKey="PE" stroke="#C0392B" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </Panel>
           <Panel title="OI by Strike">
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={buildup}>
-                <CartesianGrid stroke="#1f2937" />
-                <XAxis dataKey="strike" stroke="#64748b" fontSize={10} />
-                <YAxis stroke="#64748b" fontSize={10} tickFormatter={(v) => compact(v)} />
-                <Tooltip contentStyle={{ background: "#111722", border: "1px solid #1f2937" }} />
-                <Bar dataKey="CE_OI" fill="#16c784" />
-                <Bar dataKey="PE_OI" fill="#ea3943" />
+                <CartesianGrid stroke="#E3DBCB" />
+                <XAxis dataKey="strike" stroke="#8C857A" fontSize={10} />
+                <YAxis stroke="#8C857A" fontSize={10} tickFormatter={(v) => compact(v)} />
+                <Tooltip contentStyle={{ background: "#FCFBF8", border: "1px solid #E3DBCB", borderRadius: 8, color: "#2A2620" }} />
+                <Bar dataKey="CE_OI" fill="#15803D" />
+                <Bar dataKey="PE_OI" fill="#C0392B" />
               </BarChart>
             </ResponsiveContainer>
           </Panel>
