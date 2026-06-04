@@ -55,7 +55,9 @@ export const api = {
   expiries: (symbol: string) => get<{ expiries: string[] }>(`/expiries?symbol=${symbol}`),
   quote: (token: string) => get<Quote>(`/quote/${token}`),
   candles: (token: string, interval = "ONE_DAY", days = 90) =>
-    get<{ candles: Candle[] }>(`/candles/${token}?interval=${interval}&days=${days}`),
+    get<{ candles: Candle[]; source: { type: string; symbol: string; token: string } | null }>(
+      `/candles/${token}?interval=${interval}&days=${days}`
+    ),
   chain: (symbol: string, expiry?: string, strikes = 15) =>
     get<OptionChain>(
       `/chain?symbol=${symbol}${expiry ? `&expiry=${expiry}` : ""}&strikes=${strikes}`

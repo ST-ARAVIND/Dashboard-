@@ -258,5 +258,44 @@ class ScripMaster:
     def is_european(self, underlying: str) -> bool:
         return (underlying or "").strip().upper() in EUROPEAN_INDEX_UNDERLYINGS
 
+    def nearest_future(self, underlying: str) -> dict | None:
+        """Nearest-expiry futures (FUTIDX/FUTSTK) instrument for an underlying.
+
+        Used as a candle source for indices, whose spot token returns no
+        historical data from Angel's getCandleData.
+        """
+        name = (underlying or "").strip().upper()
+        with SessionLocal() as db:
+            rows = db.scalars(
+                select(Instrument).where(
+                    Instrument.name == name,
+                    Instrument.exch_seg == "NFO",
+                    Instrument.instrumenttype.in_(("FUTIDX", "FUTSTK")),
+                    Instrument.expiry != "",
+                )
+            ).all()
+        futs = [r for r in rows]
+        if not futs:
+            return None
+        # Pick the soonest expiry that hasn't passed; else the soonest overall.
+        now = datetime.utcnow()
+        futs.sort(key=lambda r: (parse_expiry(r.expiry) or datetime.max))
+        upcoming = [r for r in futs if (parse_expiry(r.expiry) or datetime.max) >= now]
+        chosen = upcoming[0] if upcoming else futs[0]
+        return chosen.as_dict()
+
+    def is_index_spot(self, token: str) -> bool:
+        """True if the token is an NSE index spot row (no strike/expiry)."""
+        inst = self.get_by_token(token)
+        if not inst:
+            return False
+        return (
+            inst["exch_seg"] == "NSE"
+            and inst["strike"] == 0.0
+            and not inst["expiry"]
+            and inst["name"].upper() in EUROPEAN_INDEX_UNDERLYINGS
+            and not inst["symbol"].upper().endswith("-EQ")
+        )
+
 
 scrip_master = ScripMaster()

@@ -102,7 +102,16 @@ export default function SymbolDetail() {
         {quote?.oi != null && <Stat label="OI" value={compact(quote.oi)} />}
       </div>
 
-      <Panel title="Price (Daily)">
+      <Panel
+        title="Price (Daily)"
+        right={
+          candleData?.source?.type === "futures" ? (
+            <span className="chip bg-accent/20 text-accent" title="Index spot has no historical data on Angel; showing nearest-month futures.">
+              futures · {candleData.source.symbol}
+            </span>
+          ) : undefined
+        }
+      >
         {candleData?.candles?.length ? (
           <PriceChart candles={candleData.candles} />
         ) : (

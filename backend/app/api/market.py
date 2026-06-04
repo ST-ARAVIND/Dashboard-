@@ -39,4 +39,14 @@ def candles(
     if inst:
         exchange = inst["exch_seg"]
     data = market_data.get_candles(token, exchange, interval, days)
-    return {"token": token, "interval": interval, "candles": data}
+    source = None
+
+    # Angel's getCandleData returns nothing for index SPOT tokens. Fall back to
+    # the nearest-expiry index FUTURES, which do have historical candles.
+    if not data and inst and scrip_master.is_index_spot(token):
+        fut = scrip_master.nearest_future(inst["name"])
+        if fut:
+            data = market_data.get_candles(fut["token"], "NFO", interval, days)
+            source = {"type": "futures", "symbol": fut["symbol"], "token": fut["token"]}
+
+    return {"token": token, "interval": interval, "candles": data, "source": source}
