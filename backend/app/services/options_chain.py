@@ -120,6 +120,7 @@ def build_chain(
     # Analytics over the windowed chain.
     pcr = oi.put_call_ratio(chain_rows)
     mp = oi.max_pain([rows_by_strike[s] for s in all_strikes])  # max pain over full chain
+    metrics = oi.option_metrics(chain_rows, spot_ltp, atm)
 
     # Tokens of visible strikes for live subscription.
     visible_tokens = []
@@ -138,6 +139,7 @@ def build_chain(
         "rows": chain_rows,
         "analytics": {
             **pcr,
+            **metrics,
             "max_pain": mp,
             "sentiment": oi.pcr_sentiment(pcr.get("pcr_oi")),
         },

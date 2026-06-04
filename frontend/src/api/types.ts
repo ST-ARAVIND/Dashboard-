@@ -66,6 +66,11 @@ export interface ChainAnalytics {
   total_pe_oi: number;
   max_pain: number | null;
   sentiment: string;
+  atm_iv: number | null;
+  iv_skew: number | null;
+  atm_straddle: number | null;
+  expected_move_pts: number | null;
+  expected_move_pct: number | null;
 }
 
 export interface OptionChain {

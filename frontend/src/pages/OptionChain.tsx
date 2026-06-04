@@ -4,6 +4,7 @@ import { api } from "../api/client";
 import { useTicks } from "../hooks/useLiveFeed";
 import { compact, fmt, signClass, BUILDUP_LABEL } from "../lib/format";
 import { Loading, ErrorState } from "../components/ui";
+import { OIProfile } from "../components/OIProfile";
 
 const UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"];
 
@@ -11,6 +12,7 @@ export default function OptionChainPage() {
   const [symbol, setSymbol] = useState("NIFTY");
   const [expiry, setExpiry] = useState<string | undefined>(undefined);
   const [strikes, setStrikes] = useState(15);
+  const [view, setView] = useState<"table" | "profile">("table");
 
   // Reset expiry when symbol changes.
   useEffect(() => setExpiry(undefined), [symbol]);
@@ -83,29 +85,59 @@ export default function OptionChainPage() {
           <span className="num w-6">{strikes}</span>
         </div>
 
-        <div className="flex gap-4 ml-auto num text-[13px]">
-          <span>
-            Spot <b>{fmt(chain?.spot ?? null)}</b>
-          </span>
-          <span>
-            ATM <b>{fmt(chain?.atm_strike ?? null, 0)}</b>
-          </span>
-          <span>
-            PCR(OI){" "}
-            <b className={a?.sentiment === "bullish" ? "text-bull" : a?.sentiment === "bearish" ? "text-bear" : ""}>
-              {a?.pcr_oi ?? "—"}
-            </b>
-          </span>
-          <span>
-            Max Pain <b>{fmt(a?.max_pain ?? null, 0)}</b>
-          </span>
+        {/* Table / OI-profile view toggle */}
+        <div className="flex border border-line rounded-md overflow-hidden text-[11px]">
+          {(["table", "profile"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              className={`px-2.5 py-1 ${view === v ? "bg-accent/15 text-accent" : "text-muted hover:text-ink"}`}
+            >
+              {v === "table" ? "Table" : "OI Profile"}
+            </button>
+          ))}
         </div>
+      </div>
+
+      {/* Metrics strip */}
+      <div className="panel px-3 py-2 flex flex-wrap gap-x-6 gap-y-1 num text-[12px]">
+        <span>Spot <b>{fmt(chain?.spot ?? null)}</b></span>
+        <span>ATM <b>{fmt(chain?.atm_strike ?? null, 0)}</b></span>
+        <span>
+          PCR(OI){" "}
+          <b className={a?.sentiment === "bullish" ? "text-bull" : a?.sentiment === "bearish" ? "text-bear" : ""}>
+            {a?.pcr_oi ?? "—"}
+          </b>
+        </span>
+        <span>Max Pain <b>{fmt(a?.max_pain ?? null, 0)}</b></span>
+        <span className="text-muted">|</span>
+        <span>ATM IV <b>{a?.atm_iv != null ? `${a.atm_iv}%` : "—"}</b></span>
+        <span title="OTM put IV − OTM call IV; >0 = downside (put) skew">
+          Skew{" "}
+          <b className={(a?.iv_skew ?? 0) > 0 ? "text-bear" : "text-bull"}>
+            {a?.iv_skew != null ? `${a.iv_skew > 0 ? "+" : ""}${a.iv_skew}%` : "—"}
+          </b>
+        </span>
+        <span>Straddle <b>₹{fmt(a?.atm_straddle ?? null, 0)}</b></span>
+        <span title="~1σ expected move to expiry (≈ ATM straddle)">
+          Exp. Move{" "}
+          <b className="text-accent">
+            {a?.expected_move_pct != null ? `±${a.expected_move_pct}%` : "—"}
+            {a?.expected_move_pts != null ? ` (±${fmt(a.expected_move_pts, 0)})` : ""}
+          </b>
+        </span>
       </div>
 
       {error && <div className="panel"><ErrorState message={`Failed to load chain: ${(error as Error).message}`} /></div>}
       {isLoading && <div className="panel"><Loading label="Building option chain…" /></div>}
 
-      {!isLoading && !error && rows.length > 0 && (
+      {!isLoading && !error && rows.length > 0 && view === "profile" && (
+        <div className="panel p-4">
+          <OIProfile rows={rows} atmStrike={chain?.atm_strike ?? null} />
+        </div>
+      )}
+
+      {!isLoading && !error && rows.length > 0 && view === "table" && (
         <div className="panel overflow-auto">
           <table className="w-full text-[12px] num">
             <thead className="text-muted text-[10px] uppercase sticky top-0 bg-bg-panel z-10">

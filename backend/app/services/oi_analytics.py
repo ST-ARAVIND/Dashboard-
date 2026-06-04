@@ -44,6 +44,58 @@ def pcr_sentiment(pcr_oi: float | None) -> str:
 
 
 # ---------------------------------------------------------------------- #
+# Option metrics (ATM IV, skew, straddle, expected move)
+# ---------------------------------------------------------------------- #
+def option_metrics(chain_rows: list[dict], spot: float | None, atm_strike: float | None) -> dict:
+    """Derive ATM IV, IV skew, ATM straddle price and expected move.
+
+    All from the assembled chain (CE/PE iv + ltp per strike):
+      * atm_iv       — mean of ATM call & put IV (%)
+      * iv_skew      — mean OTM-put IV minus mean OTM-call IV (%); >0 = put skew
+      * atm_straddle — ATM call price + ATM put price (₹)
+      * expected_move_pts/pct — ~1σ move to expiry ≈ the ATM straddle
+    """
+    out = {
+        "atm_iv": None,
+        "iv_skew": None,
+        "atm_straddle": None,
+        "expected_move_pts": None,
+        "expected_move_pct": None,
+    }
+    if not chain_rows or atm_strike is None:
+        return out
+
+    atm = next((r for r in chain_rows if r.get("strike") == atm_strike), None)
+    if atm:
+        ce_iv = (atm.get("ce") or {}).get("iv")
+        pe_iv = (atm.get("pe") or {}).get("iv")
+        ivs = [v for v in (ce_iv, pe_iv) if v is not None]
+        if ivs:
+            out["atm_iv"] = round(sum(ivs) / len(ivs), 2)
+        ce_ltp = (atm.get("ce") or {}).get("ltp")
+        pe_ltp = (atm.get("pe") or {}).get("ltp")
+        if ce_ltp is not None and pe_ltp is not None:
+            straddle = ce_ltp + pe_ltp
+            out["atm_straddle"] = round(straddle, 2)
+            out["expected_move_pts"] = round(straddle, 2)
+            if spot:
+                out["expected_move_pct"] = round(straddle / spot * 100, 2)
+
+    # Skew: OTM puts (strikes below spot) vs OTM calls (strikes above spot),
+    # nearest 3 each side.
+    if spot:
+        below = sorted([r for r in chain_rows if r["strike"] < spot], key=lambda r: -r["strike"])[:3]
+        above = sorted([r for r in chain_rows if r["strike"] > spot], key=lambda r: r["strike"])[:3]
+        put_ivs = [(r.get("pe") or {}).get("iv") for r in below]
+        put_ivs = [v for v in put_ivs if v is not None]
+        call_ivs = [(r.get("ce") or {}).get("iv") for r in above]
+        call_ivs = [v for v in call_ivs if v is not None]
+        if put_ivs and call_ivs:
+            out["iv_skew"] = round(sum(put_ivs) / len(put_ivs) - sum(call_ivs) / len(call_ivs), 2)
+    return out
+
+
+# ---------------------------------------------------------------------- #
 # Max pain
 # ---------------------------------------------------------------------- #
 def max_pain(chain_rows: list[dict]) -> float | None:
