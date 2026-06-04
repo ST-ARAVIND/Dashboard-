@@ -34,12 +34,52 @@ body {
 
 @layer components {
   .panel {
-    @apply bg-bg-panel border border-line rounded-lg;
+    @apply bg-bg-panel border border-line rounded-lg shadow-sm;
   }
   .num {
     @apply font-mono tabular-nums;
   }
   .chip {
-    @apply text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded;
+    @apply inline-flex items-center gap-1 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded font-medium;
   }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-line bg-bg-soft px-3 py-1.5
+           text-slate-200 transition-colors hover:border-accent hover:text-white disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+  .input {
+    @apply w-full bg-bg-soft border border-line rounded-md px-3 py-1.5 text-[13px] outline-none
+           transition-colors focus:border-accent placeholder:text-muted/70;
+  }
+  .card-hover {
+    @apply transition-all hover:border-accent/60 hover:bg-bg-soft/40;
+  }
+}
+
+/* Loading skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #161e2e 25%, #1f2937 37%, #161e2e 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* Flash a value when it changes (live ticks) */
+.flash-up {
+  animation: flashUp 0.6s ease;
+}
+.flash-down {
+  animation: flashDown 0.6s ease;
+}
+@keyframes flashUp {
+  0% { background-color: rgba(22, 199, 132, 0.35); }
+  100% { background-color: transparent; }
+}
+@keyframes flashDown {
+  0% { background-color: rgba(234, 57, 67, 0.35); }
+  100% { background-color: transparent; }
 }

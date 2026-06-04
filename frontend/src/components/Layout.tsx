@@ -3,6 +3,7 @@ import { useFeedConnection } from "../hooks/useLiveFeed";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { SearchBar } from "./SearchBar";
+import { Clock } from "./Clock";
 
 const NAV = [
   { to: "/", label: "Overview", end: true },
@@ -54,12 +55,14 @@ export default function Layout() {
         <div className="flex-1 max-w-md">
           <SearchBar />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Clock />
           <MarketBadge marketStatus={marketStatus} />
           <span
             className={`chip ${connected ? "bg-bull/20 text-bull" : "bg-amber-500/20 text-amber-400"}`}
           >
-            {connected ? "● Live" : "○ Reconnecting"}
+            <span className={connected ? "" : "animate-pulse"}>{connected ? "●" : "○"}</span>
+            {connected ? "Live" : "Reconnecting"}
           </span>
         </div>
       </header>

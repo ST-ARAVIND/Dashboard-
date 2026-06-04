@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { useTicks } from "../hooks/useLiveFeed";
 import { Panel } from "../components/Panel";
+import { FlashNum } from "../components/ui";
 import { compact, fmt, pct, signClass } from "../lib/format";
 import type { SearchResult } from "../api/types";
 
@@ -100,7 +101,7 @@ export default function Watchlist() {
                       </Link>
                       <span className="text-[10px] text-muted ml-1">{it.exch_seg}</span>
                     </td>
-                    <td className="text-right px-2">{fmt(ltp)}</td>
+                    <td className="text-right px-2"><FlashNum value={ltp} /></td>
                     <td className={`text-right px-2 ${signClass(chg)}`}>{fmt(chg)}</td>
                     <td className={`text-right px-2 ${signClass(chg)}`}>{pct(it.percent_change)}</td>
                     <td className="text-right px-2">{compact(t?.volume ?? it.volume)}</td>

@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { Panel, Stat } from "../components/Panel";
 import { SentimentGauge } from "../components/SentimentGauge";
-import { compact, fmt, pct, signClass, BUILDUP_LABEL } from "../lib/format";
+import { compact, fmt, signClass, BUILDUP_LABEL } from "../lib/format";
+import { Badge, Change, Skeleton } from "../components/ui";
 
 function IndexCard({ symbol }: { symbol: string }) {
   const { data, isLoading } = useQuery({
@@ -11,10 +12,22 @@ function IndexCard({ symbol }: { symbol: string }) {
     queryFn: () => api.chain(symbol, undefined, 10),
     refetchInterval: 15000,
   });
+  const sentiment = data?.analytics?.sentiment;
   return (
-    <Link to="/chain" className="panel px-3 py-2 min-w-[150px] hover:border-accent transition">
-      <div className="text-[11px] text-muted uppercase">{symbol}</div>
-      <div className="num text-lg">{isLoading ? "…" : fmt(data?.spot ?? null)}</div>
+    <Link to="/chain" className="panel card-hover px-3 py-2 min-w-[160px] flex-1">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-muted uppercase tracking-wide">{symbol}</span>
+        {sentiment && (
+          <Badge variant={sentiment === "bullish" ? "bull" : sentiment === "bearish" ? "bear" : "neutral"}>
+            {sentiment}
+          </Badge>
+        )}
+      </div>
+      {isLoading ? (
+        <Skeleton className="h-6 w-24 my-1" />
+      ) : (
+        <div className="num text-xl">{fmt(data?.spot ?? null)}</div>
+      )}
       <div className="text-[11px] num text-muted">
         ATM {fmt(data?.atm_strike ?? null, 0)} · PCR {data?.analytics?.pcr_oi ?? "—"}
       </div>
@@ -64,19 +77,25 @@ export default function Overview() {
         <IndexCard symbol="NIFTY" />
         <IndexCard symbol="BANKNIFTY" />
         <IndexCard symbol="FINNIFTY" />
-        <div className="panel px-3 py-2 min-w-[150px]">
-          <div className="text-[11px] text-muted uppercase">India VIX</div>
-          <div className="num text-lg">{fmt(vix?.value ?? null)}</div>
-          <div className={`text-[11px] num ${signClass(vix?.net_change)}`}>
-            {pct(vix?.percent_change)}
-          </div>
+        <div className="panel card-hover px-3 py-2 min-w-[160px] flex-1">
+          <div className="text-[11px] text-muted uppercase tracking-wide">India VIX</div>
+          {vix ? (
+            <>
+              <div className="num text-xl">{fmt(vix.value)}</div>
+              <div className="text-[11px]">
+                <Change value={vix.net_change} percent={vix.percent_change} />
+              </div>
+            </>
+          ) : (
+            <Skeleton className="h-6 w-20 my-1" />
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Sentiment gauge */}
-        <Panel title="Composite Sentiment">
-          {breadth?.gauge ? (
+        <Panel title="Composite Sentiment" loading={!breadth?.gauge}>
+          {breadth?.gauge && (
             <div className="flex flex-col items-center gap-3">
               <SentimentGauge score={breadth.gauge.score} label={breadth.gauge.label} />
               <div className="grid grid-cols-3 gap-3 w-full text-center">
@@ -88,13 +107,11 @@ export default function Overview() {
                 ))}
               </div>
             </div>
-          ) : (
-            <div className="text-muted text-center py-8">Loading…</div>
           )}
         </Panel>
 
         {/* Market breadth */}
-        <Panel title="Market Breadth">
+        <Panel title="Market Breadth" loading={!breadth}>
           <div className="grid grid-cols-2 gap-4">
             <Stat label="Advances" value={ad?.advances ?? "—"} valueClass="text-bull" />
             <Stat label="Declines" value={ad?.declines ?? "—"} valueClass="text-bear" />
@@ -110,37 +127,34 @@ export default function Overview() {
         </Panel>
 
         {/* Top OI movers */}
-        <Panel title="NIFTY — Top OI Movers">
-          {movers.length ? (
-            <table className="w-full text-[12px]">
-              <thead className="text-muted text-[10px] uppercase">
-                <tr>
-                  <th className="text-left">Strike</th>
-                  <th className="text-left">Type</th>
-                  <th className="text-right">ΔOI</th>
-                  <th className="text-right">Buildup</th>
+        <Panel
+          title="NIFTY — Top OI Movers"
+          empty={movers.length ? null : "OI movers appear once intraday snapshots accumulate (market hours)."}
+        >
+          <table className="w-full text-[12px]">
+            <thead className="text-muted text-[10px] uppercase">
+              <tr>
+                <th className="text-left font-medium pb-1">Strike</th>
+                <th className="text-left font-medium">Type</th>
+                <th className="text-right font-medium">ΔOI</th>
+                <th className="text-right font-medium">Buildup</th>
+              </tr>
+            </thead>
+            <tbody className="num">
+              {movers.map((m, i) => (
+                <tr key={i} className="border-t border-line/50">
+                  <td className="py-0.5">{m.strike}</td>
+                  <td className={m.type === "CE" ? "text-bear" : "text-bull"}>{m.type}</td>
+                  <td className={`text-right ${signClass(m.oi_change)}`}>{compact(m.oi_change)}</td>
+                  <td className="text-right">
+                    <span className={`chip ${BUILDUP_LABEL[m.buildup]?.cls}`}>
+                      {BUILDUP_LABEL[m.buildup]?.text}
+                    </span>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="num">
-                {movers.map((m, i) => (
-                  <tr key={i} className="border-t border-line/50">
-                    <td>{m.strike}</td>
-                    <td className={m.type === "CE" ? "text-bear" : "text-bull"}>{m.type}</td>
-                    <td className={`text-right ${signClass(m.oi_change)}`}>{compact(m.oi_change)}</td>
-                    <td className="text-right">
-                      <span className={`chip ${BUILDUP_LABEL[m.buildup]?.cls}`}>
-                        {BUILDUP_LABEL[m.buildup]?.text}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="text-muted text-center py-8">
-              OI movers appear once snapshots accumulate (market hours).
-            </div>
-          )}
+              ))}
+            </tbody>
+          </table>
         </Panel>
       </div>
 
@@ -148,9 +162,9 @@ export default function Overview() {
       <Panel
         title="Market News"
         right={
-          <span className={`chip ${news?.avg_label === "positive" ? "bg-bull/20 text-bull" : news?.avg_label === "negative" ? "bg-bear/20 text-bear" : "bg-slate-600/20 text-slate-400"}`}>
+          <Badge variant={news?.avg_label === "positive" ? "bull" : news?.avg_label === "negative" ? "bear" : "neutral"}>
             avg {news?.avg_sentiment ?? "—"}
-          </span>
+          </Badge>
         }
       >
         <div className="space-y-1 max-h-64 overflow-auto">

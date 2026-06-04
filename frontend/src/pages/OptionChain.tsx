@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { useTicks } from "../hooks/useLiveFeed";
 import { compact, fmt, signClass, BUILDUP_LABEL } from "../lib/format";
+import { Loading, ErrorState } from "../components/ui";
 
 const UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"];
 
@@ -101,55 +102,57 @@ export default function OptionChainPage() {
         </div>
       </div>
 
-      {error && <div className="panel p-4 text-bear">Failed to load chain: {(error as Error).message}</div>}
-      {isLoading && <div className="panel p-8 text-center text-muted">Building option chain…</div>}
+      {error && <div className="panel"><ErrorState message={`Failed to load chain: ${(error as Error).message}`} /></div>}
+      {isLoading && <div className="panel"><Loading label="Building option chain…" /></div>}
 
-      {!isLoading && rows.length > 0 && (
+      {!isLoading && !error && rows.length > 0 && (
         <div className="panel overflow-auto">
           <table className="w-full text-[12px] num">
-            <thead className="text-muted text-[10px] uppercase sticky top-0 bg-bg-panel">
-              <tr>
-                <th className="px-2 py-1.5 text-bull/80" colSpan={5}>CALLS</th>
+            <thead className="text-muted text-[10px] uppercase sticky top-0 bg-bg-panel z-10">
+              <tr className="border-b border-line">
+                <th className="px-2 py-1.5 text-bull/80 text-left" colSpan={5}>CALLS</th>
                 <th className="px-2 py-1.5 text-center">Strike</th>
-                <th className="px-2 py-1.5 text-bear/80" colSpan={5}>PUTS</th>
+                <th className="px-2 py-1.5 text-bear/80 text-right" colSpan={5}>PUTS</th>
               </tr>
               <tr className="text-[9px]">
-                <th className="px-2 text-right">OI</th>
-                <th className="px-2 text-right">ΔOI</th>
-                <th className="px-2 text-right">Vol</th>
-                <th className="px-2 text-right">IV</th>
-                <th className="px-2 text-right">LTP</th>
-                <th className="px-2 text-center">·</th>
-                <th className="px-2 text-left">LTP</th>
-                <th className="px-2 text-left">IV</th>
-                <th className="px-2 text-left">Vol</th>
-                <th className="px-2 text-left">ΔOI</th>
-                <th className="px-2 text-left">OI</th>
+                <th className="px-2 text-right font-medium">OI</th>
+                <th className="px-2 text-right font-medium">ΔOI</th>
+                <th className="px-2 text-right font-medium">Vol</th>
+                <th className="px-2 text-right font-medium">IV</th>
+                <th className="px-2 text-right font-medium">LTP</th>
+                <th className="px-2 text-center font-medium"></th>
+                <th className="px-2 text-left font-medium">LTP</th>
+                <th className="px-2 text-left font-medium">IV</th>
+                <th className="px-2 text-left font-medium">Vol</th>
+                <th className="px-2 text-left font-medium">ΔOI</th>
+                <th className="px-2 text-left font-medium">OI</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => {
                 const isATM = r.strike === chain?.atm_strike;
+                const spot = chain?.spot ?? null;
+                // CE in-the-money when strike < spot; PE ITM when strike > spot.
+                const ceItm = spot != null && r.strike < spot ? "bg-bull/[0.06]" : "";
+                const peItm = spot != null && r.strike > spot ? "bg-bear/[0.06]" : "";
                 return (
                   <tr
                     key={r.strike}
-                    className={`border-t border-line/40 ${isATM ? "bg-accent/10" : "hover:bg-bg-soft/50"}`}
+                    className={`border-t border-line/40 ${isATM ? "bg-accent/10 ring-1 ring-inset ring-accent/30" : "hover:bg-bg-soft/50"}`}
                   >
-                    {/* CE side (ITM tint when strike < spot) */}
-                    <Cell v={compact(r.ce?.oi)} />
-                    <Cell v={compact(r.ce?.oi_change)} cls={signClass(r.ce?.oi_change)} align="right" />
-                    <Cell v={compact(r.ce?.volume)} />
-                    <Cell v={r.ce?.iv != null ? r.ce.iv.toFixed(1) : "—"} />
-                    <Cell v={fmt(r.ce?.ltp ?? null)} cls={signClass(r.ce?.net_change)} align="right" bold />
+                    <Cell v={compact(r.ce?.oi)} cls={ceItm} />
+                    <Cell v={compact(r.ce?.oi_change)} cls={`${signClass(r.ce?.oi_change)} ${ceItm}`} align="right" />
+                    <Cell v={compact(r.ce?.volume)} cls={ceItm} />
+                    <Cell v={r.ce?.iv != null ? r.ce.iv.toFixed(1) : "—"} cls={ceItm} />
+                    <Cell v={fmt(r.ce?.ltp ?? null)} cls={`${signClass(r.ce?.net_change)} ${ceItm}`} align="right" bold />
 
                     <td className="px-2 py-1 text-center font-semibold bg-bg-soft/60">{r.strike}</td>
 
-                    {/* PE side */}
-                    <Cell v={fmt(r.pe?.ltp ?? null)} cls={signClass(r.pe?.net_change)} align="left" bold />
-                    <Cell v={r.pe?.iv != null ? r.pe.iv.toFixed(1) : "—"} align="left" />
-                    <Cell v={compact(r.pe?.volume)} align="left" />
-                    <Cell v={compact(r.pe?.oi_change)} cls={signClass(r.pe?.oi_change)} align="left" />
-                    <Cell v={compact(r.pe?.oi)} align="left" />
+                    <Cell v={fmt(r.pe?.ltp ?? null)} cls={`${signClass(r.pe?.net_change)} ${peItm}`} align="left" bold />
+                    <Cell v={r.pe?.iv != null ? r.pe.iv.toFixed(1) : "—"} cls={peItm} align="left" />
+                    <Cell v={compact(r.pe?.volume)} cls={peItm} align="left" />
+                    <Cell v={compact(r.pe?.oi_change)} cls={`${signClass(r.pe?.oi_change)} ${peItm}`} align="left" />
+                    <Cell v={compact(r.pe?.oi)} cls={peItm} align="left" />
                   </tr>
                 );
               })}
