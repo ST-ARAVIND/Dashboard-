@@ -64,6 +64,19 @@ export const api = {
     ),
   oi: (symbol: string, expiry?: string) =>
     get<any>(`/oi/${symbol}${expiry ? `?expiry=${expiry}` : ""}`),
+  termStructure: (symbol: string, expiries = 5) =>
+    get<{
+      underlying: string;
+      points: {
+        expiry: string;
+        atm_strike: number | null;
+        ce_iv: number | null;
+        pe_iv: number | null;
+        atm_iv: number | null;
+        pcr_oi: number | null;
+        spot: number | null;
+      }[];
+    }>(`/analytics/term-structure?symbol=${symbol}&expiries=${expiries}`),
   marketSentiment: () => get<MarketSentiment>("/sentiment/market"),
   symbolSentiment: (symbol: string) => get<MarketSentiment>(`/sentiment/${symbol}`),
   refreshNews: () => post<{ ingested: number }>("/sentiment/refresh"),

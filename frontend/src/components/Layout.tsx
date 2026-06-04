@@ -8,6 +8,7 @@ import { Clock } from "./Clock";
 const NAV = [
   { to: "/", label: "Overview", end: true },
   { to: "/chain", label: "Option Chain" },
+  { to: "/analytics", label: "Analytics" },
   { to: "/news", label: "News & Sentiment" },
   { to: "/watchlist", label: "Watchlist" },
 ];

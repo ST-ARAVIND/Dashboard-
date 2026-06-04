@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Overview from "./pages/Overview";
 import OptionChainPage from "./pages/OptionChain";
+import Analytics from "./pages/Analytics";
 import SymbolDetail from "./pages/SymbolDetail";
 import News from "./pages/News";
 import Watchlist from "./pages/Watchlist";
@@ -12,6 +13,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Overview />} />
         <Route path="/chain" element={<OptionChainPage />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/symbol/:token" element={<SymbolDetail />} />
         <Route path="/news" element={<News />} />
         <Route path="/watchlist" element={<Watchlist />} />

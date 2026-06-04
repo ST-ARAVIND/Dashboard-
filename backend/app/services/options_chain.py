@@ -145,6 +145,38 @@ def build_chain(
     }
 
 
+def term_structure(underlying: str, max_expiries: int = 5) -> dict:
+    """ATM implied volatility and PCR(OI) across the nearest expiries.
+
+    Powers the IV term-structure curve and the multi-expiry PCR trend. Uses a
+    tiny strike window per expiry to stay light on the quote rate limiter.
+    """
+    underlying = underlying.strip().upper()
+    expiries = scrip_master.list_expiries(underlying)[:max_expiries]
+    points = []
+    for ex in expiries:
+        chain = build_chain(underlying, ex, strike_window=2)
+        if chain.get("error"):
+            continue
+        atm = chain.get("atm_strike")
+        atm_row = next((r for r in chain["rows"] if r["strike"] == atm), None)
+        ce_iv = (atm_row or {}).get("ce", {}) and (atm_row["ce"] or {}).get("iv")
+        pe_iv = (atm_row or {}).get("pe", {}) and (atm_row["pe"] or {}).get("iv")
+        ivs = [v for v in (ce_iv, pe_iv) if v is not None]
+        points.append(
+            {
+                "expiry": ex,
+                "atm_strike": atm,
+                "ce_iv": ce_iv,
+                "pe_iv": pe_iv,
+                "atm_iv": round(sum(ivs) / len(ivs), 2) if ivs else None,
+                "pcr_oi": chain["analytics"].get("pcr_oi"),
+                "spot": chain.get("spot"),
+            }
+        )
+    return {"underlying": underlying, "points": points}
+
+
 def snapshot_rows_for_underlying(underlying: str, expiry: str | None = None) -> list[dict]:
     """Build the flat OI-snapshot rows for the scheduler to persist."""
     chain = build_chain(underlying, expiry, strike_window=25)
