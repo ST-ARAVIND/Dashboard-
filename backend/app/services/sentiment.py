@@ -30,12 +30,15 @@ from ..models.instrument import Instrument
 logger = logging.getLogger("services.sentiment")
 
 # Indian financial RSS feeds (provider=rss).
+# Curated for freshness — verified live: ET and Livemint update through the day,
+# Hindu BusinessLine is the freshest. (Moneycontrol & Business Standard RSS were
+# dropped: their public feeds were stale by months / returning empty.)
 RSS_FEEDS = [
-    ("Moneycontrol", "https://www.moneycontrol.com/rss/marketreports.xml"),
-    ("Moneycontrol Business", "https://www.moneycontrol.com/rss/business.xml"),
     ("Economic Times Markets", "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms"),
-    ("Business Standard Markets", "https://www.business-standard.com/rss/markets-106.rss"),
+    ("Economic Times Stocks", "https://economictimes.indiatimes.com/markets/stocks/news/rssfeeds/2146843.cms"),
     ("Livemint Markets", "https://www.livemint.com/rss/markets"),
+    ("Livemint Money", "https://www.livemint.com/rss/money"),
+    ("Hindu BusinessLine", "https://www.thehindubusinessline.com/markets/feeder/default.rss"),
 ]
 
 # Common-word symbols to skip when matching tickers (avoid false positives).
@@ -232,9 +235,13 @@ def ingest_news() -> int:
         return 0
     scorer = get_scorer()
     new_count = 0
+    seen_uids: set[str] = set()  # de-dup within this run (feeds overlap)
     with SessionLocal() as db:
         for a in raw:
             uid = _uid(a)
+            if uid in seen_uids:
+                continue
+            seen_uids.add(uid)
             exists = db.scalar(select(NewsArticle.id).where(NewsArticle.uid == uid))
             if exists:
                 continue

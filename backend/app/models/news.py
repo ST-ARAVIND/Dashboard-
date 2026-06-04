@@ -1,7 +1,7 @@
 """News articles with sentiment scores."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Float, Integer, String, Text, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
@@ -37,7 +37,13 @@ class NewsArticle(Base):
             "title": self.title,
             "summary": self.summary,
             "url": self.url,
-            "published_at": self.published_at.isoformat() if self.published_at else None,
+            # Stored naive but always in UTC — emit an explicit offset so the
+            # browser computes "X ago" correctly (otherwise it assumes local TZ).
+            "published_at": (
+                self.published_at.replace(tzinfo=timezone.utc).isoformat()
+                if self.published_at
+                else None
+            ),
             "sentiment_score": round(self.sentiment_score, 4),
             "sentiment_label": self.sentiment_label,
             "sentiment_model": self.sentiment_model,
