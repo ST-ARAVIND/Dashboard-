@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 
 from ..angel.scrip_master import scrip_master
+from ..utils.cache import market_ttl_cache
 from .market_data import market_data
 from .oi_analytics import pcr_sentiment
 
@@ -118,6 +119,7 @@ def composite_gauge(vix: dict | None, ad: dict, pcr_oi: float | None) -> dict:
     return {"score": round(score, 1), "label": label, "components": components}
 
 
+@market_ttl_cache(open_ttl=20.0, closed_ttl=600.0)
 def market_breadth() -> dict:
     vix = india_vix()
     ad = advance_decline()

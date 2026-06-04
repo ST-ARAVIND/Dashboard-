@@ -15,6 +15,7 @@ import logging
 import numpy as np
 
 from ..angel.scrip_master import parse_expiry, scrip_master
+from ..utils.cache import market_ttl_cache
 from . import iv_greeks as ivg
 from . import oi_analytics as oi
 from .market_data import market_data
@@ -28,7 +29,22 @@ def _atm_strike(spot: float, strikes: list[float]) -> float | None:
     return min(strikes, key=lambda k: abs(k - spot))
 
 
-def build_chain(
+def build_chain(underlying: str, expiry: str | None = None, strike_window: int = 15) -> dict:
+    """Build the assembled option chain (cached, market-aware TTL).
+
+    Normalizes args so callers that pass the underlying/expiry differently still
+    share one cache entry (e.g. the Overview's NIFTY chain and the breadth
+    module's internal NIFTY chain).
+    """
+    return _build_chain_cached((underlying or "").strip().upper(), expiry or None, strike_window)
+
+
+@market_ttl_cache(open_ttl=12.0, closed_ttl=600.0)
+def _build_chain_cached(underlying: str, expiry: str | None, strike_window: int) -> dict:
+    return _build_chain_impl(underlying, expiry, strike_window)
+
+
+def _build_chain_impl(
     underlying: str,
     expiry: str | None = None,
     strike_window: int = 15,
@@ -147,6 +163,7 @@ def build_chain(
     }
 
 
+@market_ttl_cache(open_ttl=30.0, closed_ttl=900.0)
 def term_structure(underlying: str, max_expiries: int = 5) -> dict:
     """ATM implied volatility and PCR(OI) across the nearest expiries.
 
