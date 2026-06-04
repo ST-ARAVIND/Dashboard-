@@ -182,6 +182,24 @@ export interface AlertEvent {
   ts: string | null;
 }
 
+export interface ScanStock {
+  name: string;
+  sector: string;
+  price: number;
+  chg: number;
+  gap: number;
+  gap_type: "Breakaway" | "Exhaustion" | "Common" | "None";
+  vroc: number;
+  vol_ratio: number;
+  volume: number;
+}
+
+export interface ScannersResponse {
+  stocks: ScanStock[];
+  generated_at: string | null;
+  status: "ready" | "computing";
+}
+
 export interface Candle {
   time: string;
   open: number;

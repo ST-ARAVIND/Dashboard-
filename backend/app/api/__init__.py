@@ -1,7 +1,7 @@
 """FastAPI routers."""
 from . import (
     auth, instruments, market, chain, oi, sentiment, breadth, watchlist, ws,
-    analytics, alerts,
+    analytics, alerts, scanners,
 )
 
 routers = [
@@ -16,6 +16,7 @@ routers = [
     ws.router,
     analytics.router,
     alerts.router,
+    scanners.router,
 ]
 
 __all__ = ["routers"]

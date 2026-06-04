@@ -64,6 +64,18 @@ def _news_job() -> None:
         logger.warning("news ingest failed: %s", exc)
 
 
+def _scanner_job() -> None:
+    """Refresh VROC/gap scanners (candles are cached, so this is cheap)."""
+    if not settings.angel_credentials_present:
+        return
+    from .services import scanners
+
+    try:
+        scanners.compute()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("scanner compute failed: %s", exc)
+
+
 def _scrip_refresh_job() -> None:
     from .angel.scrip_master import scrip_master
 
@@ -88,6 +100,10 @@ def start_scheduler() -> BackgroundScheduler:
         max_instances=1, coalesce=True,
     )
     sched.add_job(_news_job, "interval", minutes=10, id="news", max_instances=1, coalesce=True)
+    sched.add_job(
+        _scanner_job, "interval", minutes=20, id="scanners",
+        max_instances=1, coalesce=True,
+    )
     sched.add_job(_scrip_refresh_job, "cron", hour=8, minute=15, id="scrip_refresh")
     sched.start()
     _scheduler = sched

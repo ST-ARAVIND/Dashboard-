@@ -8,6 +8,7 @@ import type {
   NewAlert,
   OptionChain,
   Quote,
+  ScannersResponse,
   SearchResult,
   WatchItem,
 } from "./types";
@@ -83,6 +84,7 @@ export const api = {
   symbolSentiment: (symbol: string) => get<MarketSentiment>(`/sentiment/${symbol}`),
   refreshNews: () => post<{ ingested: number }>("/sentiment/refresh"),
   breadth: () => get<Breadth>("/breadth"),
+  scanners: () => get<ScannersResponse>("/scanners"),
   alerts: () => get<{ alerts: AlertRule[] }>("/alerts"),
   createAlert: (a: NewAlert) => post<AlertRule>("/alerts", a),
   deleteAlert: (id: number) => del(`/alerts/${id}`),

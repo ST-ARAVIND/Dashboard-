@@ -258,6 +258,16 @@ class ScripMaster:
     def is_european(self, underlying: str) -> bool:
         return (underlying or "").strip().upper() in EUROPEAN_INDEX_UNDERLYINGS
 
+    def fno_underlyings(self) -> list[str]:
+        """Distinct stock names that have stock options (OPTSTK) — the F&O universe."""
+        with SessionLocal() as db:
+            rows = db.execute(
+                select(Instrument.name)
+                .where(Instrument.exch_seg == "NFO", Instrument.instrumenttype == "OPTSTK")
+                .distinct()
+            ).all()
+        return sorted({r[0] for r in rows if r[0]})
+
     def nearest_future(self, underlying: str) -> dict | None:
         """Nearest-expiry futures (FUTIDX/FUTSTK) instrument for an underlying.
 
